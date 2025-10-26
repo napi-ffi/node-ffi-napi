@@ -249,9 +249,11 @@ int test_ref_56(struct Obj56 *obj) {
 
 /*
  * Converts an arbitrary pointer to a node Buffer (with 0-length)
+ * NOTE: Nodejs versions 16/18/20 can;'t take length 0 - they give back a null pointer
+ * so supply 8 as the default.
  */
 template<typename T>
-inline Value WrapPointer(Env env, T* ptr, size_t length = 0) {
+inline Value WrapPointer(Env env, T* ptr, size_t length = 8) {
   if (ptr == nullptr)
     length = 0;
   return Buffer<char>::New(env,

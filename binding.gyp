@@ -8,8 +8,8 @@
     ],
     'include_dirs': [
       "<!@(node -p \"require('node-addon-api').include\")",
-      "<!@(node -p \"require('get-uv-event-loop-napi-h').include\")",
-      "<!@(node -p \"require('ref-napi/lib/get-paths').include\")",
+      "<!@(node -p \"require('@napi-ffi/get-uv-event-loop-napi-h').include\")",
+      "<!@(node -p \"require('@napi-ffi/ref-napi/lib/get-paths').include\")",
     ],
     'dependencies': [
       "<!(node -p \"require('node-addon-api').gyp\")",
@@ -21,6 +21,7 @@
       'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
       'CLANG_CXX_LIBRARY': 'libc++',
       'MACOSX_DEPLOYMENT_TARGET': '10.7',
+      'OTHER_CPLUSPLUSFLAGS' : [ '-std=c++11', '-stdlib=libc++' ],
     },
     'msvs_settings': {
       'VCCLCompilerTool': { 'ExceptionHandling': 1 },

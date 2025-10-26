@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('assert');
-const ref = require('ref-napi');
+const ref = require('@napi-ffi/ref-napi');
 const ffi = require('../');
 const bindings = require('node-gyp-build')(__dirname);
 const sprintfPtr = bindings.sprintf;
@@ -9,7 +9,7 @@ describe('variadic arguments', function () {
   afterEach(global.gc);
 
   it('should work with vararg C functions', function () {
-    const buf = new Buffer(100);
+    const buf = Buffer.alloc(100);
     const sprintfGen = ffi.VariadicForeignFunction(sprintfPtr, 'int', [ 'pointer', 'string' ]);
 
     sprintfGen()(buf, 'hello world!');

@@ -1,5 +1,4 @@
 #define NAPI_VERSION 6
-#define NAPI_EXPERIMENTAL /* Until Node.js v12.17.0 is released */
 #include "ffi.h"
 #include "fficonfig.h"
 #include <get-uv-event-loop-napi.h>

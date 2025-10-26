@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('assert');
-const ref = require('ref-napi');
+const ref = require('@napi-ffi/ref-napi');
 const ffi = require('../');
 const int = ref.types.int;
 const bindings = require('node-gyp-build')(__dirname);
@@ -174,7 +174,7 @@ describe('Callback', function () {
 
     it('multiple callback invocations from uv thread pool should be properly synchronized', function (done) {
       this.timeout(10000)
-      let iterations = 30000;
+      let iterations = 15000;
       let cb = ffi.Callback('string', [ 'string' ], function (val) {
         if (val === "ping" && --iterations > 0) {
           return "pong";

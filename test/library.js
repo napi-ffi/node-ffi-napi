@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('assert');
-const ref = require('ref-napi');
-const Struct = require('ref-struct-di')(ref);
+const ref = require('@napi-ffi/ref-napi');
+const Struct = require('@napi-ffi/ref-struct-di')(ref);
 const ffi = require('../');
 const DynamicLibrary = ffi.DynamicLibrary;
 const Library = ffi.Library;
@@ -87,7 +87,7 @@ describe('Library', function () {
   it('should work with "strcpy" and a 128 length string', function () {
     const lib = process.platform == 'win32' ? 'msvcrt.dll' : null;
     const ZEROS_128 = Array(128 + 1).join('0');
-    const buf = new Buffer(256);
+    const buf = Buffer.alloc(256);
     const strcpy = new Library(lib, {
         'strcpy': [ charPtr, [ charPtr, 'string' ] ]
     }).strcpy;
@@ -98,7 +98,7 @@ describe('Library', function () {
   it('should work with "strcpy" and a 2k length string', function () {
     const lib = process.platform == 'win32' ? 'msvcrt' : null;
     const ZEROS_2K = Array(2e3 + 1).join('0');
-    const buf = new Buffer(4096);
+    const buf = Buffer.alloc(4096);
     const strcpy = new Library(lib, {
       'strcpy': [ charPtr, [ charPtr, 'string' ] ]
     }).strcpy;

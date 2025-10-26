@@ -1,13 +1,11 @@
-node-ffi-napi
-=============
+@napi-ffi/ffi-napi
+==================
 ### Node.js Foreign Function Interface for N-API
-[![Greenkeeper badge](https://badges.greenkeeper.io/node-ffi-napi/node-ffi-napi.svg)](https://greenkeeper.io/)
 
-[![NPM Version](https://img.shields.io/npm/v/ffi-napi.svg?style=flat)](https://npmjs.org/package/ffi-napi)
-[![NPM Downloads](https://img.shields.io/npm/dm/ffi-napi.svg?style=flat)](https://npmjs.org/package/ffi-napi)
-[![Build Status](https://travis-ci.org/node-ffi-napi/node-ffi-napi.svg?style=flat&branch=master)](https://travis-ci.org/node-ffi-napi/node-ffi-napi?branch=master)
-[![Coverage Status](https://coveralls.io/repos/node-ffi-napi/node-ffi-napi/badge.svg?branch=master)](https://coveralls.io/r/node-ffi-napi/node-ffi-napi?branch=master)
-[![Dependency Status](https://david-dm.org/node-ffi-napi/node-ffi-napi.svg?style=flat)](https://david-dm.org/node-ffi-napi/node-ffi-napi)
+[![NPM Version](https://img.shields.io/npm/v/@napi-ffi/ffi-napi.svg?style=flat)](https://npmjs.org/package/@napi-ffi/ffi-napi)
+[![NPM Downloads](https://img.shields.io/npm/dm/@napi-ffi/ffi-napi.svg?style=flat)](https://npmjs.org/package/@napi-ffi/ffi-napi)
+
+> Forked from [node-ffi-napi/node-ffi-napi](https://github.com/node-ffi-napi/node-ffi-napi) to maintain and modernize the project while preserving the original APIs.
 
 `node-ffi-napi` is a Node.js addon for loading and calling dynamic libraries
 using pure JavaScript. It can be used to create bindings to native libraries
@@ -32,7 +30,7 @@ Example
 -------
 
 ``` js
-var ffi = require('ffi-napi');
+var ffi = require('@napi-ffi/ffi-napi');
 
 var libm = ffi.Library('libm', {
   'ceil': [ 'double', [ 'double' ] ]
@@ -63,7 +61,7 @@ tools](https://github.com/TooTallNate/node-gyp#installation) for your platform,
 then invoke:
 
 ``` bash
-$ npm install ffi-napi
+$ npm install @napi-ffi/ffi-napi
 ```
 
 Source Install / Manual Compilation
@@ -79,7 +77,7 @@ $ npm install -g node-gyp
 Now you can compile `node-ffi-napi`:
 
 ``` bash
-$ git clone git://github.com/node-ffi-napi/node-ffi-napi.git
+$ git clone https://github.com/napi-ffi/node-ffi-napi.git
 $ cd node-ffi
 $ node-gyp rebuild
 ```
