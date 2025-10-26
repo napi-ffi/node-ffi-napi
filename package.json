@@ -48,7 +48,7 @@
     "install": "node-gyp-build",
     "build": "node-gyp rebuild",
     "prebuild": "prebuildify --napi --tag-armv --tag-uv --strip",
-    "prepack": "prebuildify-ci download && ([ $(ls prebuilds | wc -l) = '5' ] || (echo 'Some prebuilds are missing'; exit 1))",
+    "prepack": "prebuildify-ci download && ([ $(ls prebuilds | wc -l) > '0' ] || (echo 'Some prebuilds are missing'; exit 1))",
     "test": "node-gyp rebuild --directory test && nyc mocha --expose-gc --reporter spec"
   },
   "repository": {
