@@ -21,19 +21,22 @@ describe('Library', function () {
   });
 
   it('should accept `null` as a first argument', function () {
-    if (process.platform == 'win32') {
-      // On Windows, null refers to just the main executable (e.g. node.exe).
-      // Windows never searches for symbols across multiple DLL's.
-      // Note: Exporting symbols from an executable is unusual on Windows.
-      // Normally you only see exports from DLL's. It happens that node.exe
-      // does export symbols, so null as a first argument can be tested.
-      // This is an implementation detail of node, and could potentially
-      // change in the future (e.g. if node gets broken up into DLL's
-      // rather than being one large static linked executable).
+    if (process.platform == 'win32' && !process.env.MSYSTEM_PREFIX) {
+      // On Windows (MSVC builds), null refers to just the main executable
+      // (e.g. node.exe). Windows never searches for symbols across DLLs.
+      // node.exe happens to export uv_fs_open, so null can be tested here.
+      // This is an implementation detail of node that does not hold for
+      // MSYS2/MinGW builds where libuv may be a separate DLL or symbols
+      // are not re-exported from the node binary.
       const winFuncs = new Library(null, {
         'uv_fs_open': [ 'void', [ charPtr ] ]
       });
       assert(typeof winFuncs.uv_fs_open === 'function');
+    } else if (process.platform == 'win32') {
+      // MinGW/MSYS2: null is supported but uv_fs_open is not guaranteed
+      // to be exported from the node binary, skip the symbol check.
+      const l = new Library(null, {});
+      assert(typeof l === 'object');
     } else {
       // On POSIX, null refers to the global symbol table, and lets you use
       // symbols in the main executable and loaded shared libaries.
