@@ -9,6 +9,10 @@
 {
   'variables': {
     'target_arch%': 'ia32', # built for a 32-bit CPU by default
+    # Distinguish MSVC from MinGW/MSYS2 on Windows. MinGW reports an OS type
+    # starting with "MINGW" and uses GCC toolchain, so .S files compile directly
+    # without the MSVC-specific preprocess_asm.cmd pre-processing step.
+    'target_platform%': '<!(node -p "require(\'os\').type().startsWith(\'MINGW\') ? \'mingw\' : (process.platform === \'win32\' ? \'msvc\' : \'\')")',
   },
   'target_defaults': {
     'default_configuration': 'Debug',
@@ -50,9 +54,10 @@
     ],
   },
 
-  # Compile .S files on Windows
+  # MSVC-specific rules for preprocessing .preasm -> .asm -> .obj.
+  # MinGW uses GCC and compiles .S files directly without these rules.
   'conditions': [
-    ['OS=="win"', {
+    ['OS=="win" and target_platform=="msvc"', {
       'target_defaults': {
         'conditions': [
           ['target_arch=="ia32"', {
@@ -151,8 +156,11 @@
             ['OS=="linux" or OS=="mac"', {
               'sources': [ 'src/aarch64/sysv.S' ]
             }],
-            ['OS=="win"', {
+            ['OS=="win" and target_platform=="msvc"', {
               'sources': [ 'src/aarch64/win64_armasm.preasm' ]
+            }],
+            ['OS=="win" and target_platform=="mingw"', {
+              'sources': [ 'src/aarch64/sysv.S' ]
             }],
           ]
         }, { # ia32 or x64
@@ -160,29 +168,39 @@
             ['target_arch=="ia32"', {
               'sources': [ 'src/x86/ffi.c' ],
               'conditions': [
-                ['OS=="win"', {
+                ['OS=="win" and target_platform=="msvc"', {
                   'sources': [ 'src/x86/sysv_intel.preasm' ],
-                }, {
+                }],
+                ['OS=="win" and target_platform=="mingw"', {
+                  'sources': [ 'src/x86/sysv.S' ],
+                }],
+                ['OS!="win"', {
                   'sources': [ 'src/x86/sysv.S' ],
                 }],
               ],
             }],
             ['target_arch=="x64"', {
-              'sources': [
-                'src/x86/ffiw64.c',
-              ],
               'conditions': [
-                ['OS=="win"', {
+                ['OS=="win" and target_platform=="msvc"', {
                   'sources': [
+                    'src/x86/ffiw64.c',
                     'src/x86/win64_intel.preasm',
                   ],
-                }, {
+                  'msvs_disabled_warnings': [ 4267 ],
+                }],
+                ['OS=="win" and target_platform=="mingw"', {
+                  'sources': [
+                    'src/x86/ffiw64.c',
+                    'src/x86/win64.S',
+                  ],
+                }],
+                ['OS!="win"', {
                   'sources': [
                     'src/x86/ffi64.c',
                     'src/x86/unix64.S',
                     'src/x86/win64.S',
                   ],
-                }]
+                }],
               ],
             }],
             ['target_arch=="s390x"', {
@@ -190,11 +208,6 @@
                 'src/s390/ffi.c',
                 'src/s390/sysv.S',
               ],
-            }],
-            ['OS=="win"', {
-              # the libffi dlmalloc.c file has a bunch of implicit conversion
-              # warnings, and the main ffi.c file contains one, so silence them
-              'msvs_disabled_warnings': [ 4267 ],
             }],
           ]
         }],
