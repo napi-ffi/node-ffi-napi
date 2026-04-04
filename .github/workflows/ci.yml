@@ -60,7 +60,7 @@ jobs:
             mingw-w64-x86_64-nodejs
             mingw-w64-x86_64-python
             mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-make
+            make
 
       - name: Verify MinGW Node.js is active
         shell: msys2 {0}

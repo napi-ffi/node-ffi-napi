@@ -11,11 +11,12 @@
     'target_arch%': 'ia32', # built for a 32-bit CPU by default
     # Distinguish MSVC from MinGW/MSYS2 on Windows. MinGW-compiled Node reports
     # an OS type starting with "MINGW", but MSYS2 subsystems like UCRT64 ship a
-    # Windows-native Node where os.type() returns "Windows_NT". In both cases
-    # MSYS2 sets the MSYSTEM env var (MINGW32, MINGW64, UCRT64, CLANG64, …).
-    # Either signal means GCC is the toolchain, so .S files compile directly
-    # without the MSVC-specific preprocess_asm.cmd pre-processing step.
-    'target_platform%': '<!(node -p "require(\'os\').type().startsWith(\'MINGW\') || process.env.MSYSTEM ? \'mingw\' : (process.platform === \'win32\' ? \'msvc\' : \'\')")',
+    # Windows-native Node where os.type() returns "Windows_NT". Real MSYS2 sets
+    # MSYSTEM_PREFIX (e.g. /mingw64, /ucrt64); Git for Windows also sets MSYSTEM
+    # but does NOT set MSYSTEM_PREFIX, so we use that to avoid false positives
+    # in Git Bash environments. Either signal means GCC is the toolchain, so .S
+    # files compile directly without the MSVC preprocess_asm.cmd step.
+    'target_platform%': '<!(node -p "require(\'os\').type().startsWith(\'MINGW\') || process.env.MSYSTEM_PREFIX ? \'mingw\' : (process.platform === \'win32\' ? \'msvc\' : \'\')")',
   },
   'target_defaults': {
     'default_configuration': 'Debug',
