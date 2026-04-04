@@ -42,3 +42,38 @@ jobs:
       - name: Prebuild
         shell: bash
         run: npm run prebuild
+
+  test-mingw:
+    name: Test MinGW (MSYS2 MINGW64) on Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up MSYS2 with MINGW64
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-nodejs
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+
+      - name: Verify MinGW Node.js is active
+        shell: msys2 {0}
+        run: node -e "const os = require('os'); console.log('os.type():', os.type()); if (!os.type().startsWith('MINGW')) process.exit(1)"
+
+      - name: Install dependencies
+        shell: msys2 {0}
+        run: npm install
+
+      - name: Build native tests
+        shell: msys2 {0}
+        run: npm run build
+
+      - name: Run tests
+        shell: msys2 {0}
+        run: npm test
