@@ -9,10 +9,13 @@
 {
   'variables': {
     'target_arch%': 'ia32', # built for a 32-bit CPU by default
-    # Distinguish MSVC from MinGW/MSYS2 on Windows. MinGW reports an OS type
-    # starting with "MINGW" and uses GCC toolchain, so .S files compile directly
+    # Distinguish MSVC from MinGW/MSYS2 on Windows. MinGW-compiled Node reports
+    # an OS type starting with "MINGW", but MSYS2 subsystems like UCRT64 ship a
+    # Windows-native Node where os.type() returns "Windows_NT". In both cases
+    # MSYS2 sets the MSYSTEM env var (MINGW32, MINGW64, UCRT64, CLANG64, …).
+    # Either signal means GCC is the toolchain, so .S files compile directly
     # without the MSVC-specific preprocess_asm.cmd pre-processing step.
-    'target_platform%': '<!(node -p "require(\'os\').type().startsWith(\'MINGW\') ? \'mingw\' : (process.platform === \'win32\' ? \'msvc\' : \'\')")',
+    'target_platform%': '<!(node -p "require(\'os\').type().startsWith(\'MINGW\') || process.env.MSYSTEM ? \'mingw\' : (process.platform === \'win32\' ? \'msvc\' : \'\')")',
   },
   'target_defaults': {
     'default_configuration': 'Debug',
