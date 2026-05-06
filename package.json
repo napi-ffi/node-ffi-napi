@@ -1,6 +1,6 @@
 {
   "name": "@napi-ffi/ffi-napi",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "license": "MIT",
   "author": "Anna Henningsen <anna@addaleax.net>",
   "contributors": [
@@ -25,7 +25,7 @@
   ],
   "homepage": "https://github.com/napi-ffi/node-ffi-napi",
   "engines": {
-    "node": ">=10"
+    "node": ">=20"
   },
   "main": "./lib/ffi",
   "dependencies": {
@@ -33,7 +33,7 @@
     "@napi-ffi/get-uv-event-loop-napi-h": "^1.0.6",
     "node-addon-api": "^8.2.1",
     "node-gyp-build": "^4.8.2",
-    "@napi-ffi/ref-napi": "^3.0.7",
+    "@napi-ffi/ref-napi": "^3.0.8",
     "@napi-ffi/ref-struct-di": "^1.1.1"
   },
   "devDependencies": {
@@ -41,14 +41,13 @@
     "mocha": "^7.1.1",
     "nyc": "^17.1.0",
     "prebuildify": "^6.0.1",
-    "prebuildify-ci": "^1.0.5",
     "@napi-ffi/ref-array-di": "^1.2.2"
   },
   "scripts": {
     "install": "node-gyp-build",
     "build": "node-gyp rebuild",
-    "prebuild": "prebuildify --napi --tag-armv --tag-uv --strip",
-    "prepack": "prebuildify-ci download && ([ $(ls prebuilds | wc -l) > '0' ] || (echo 'Some prebuilds are missing'; exit 1))",
+    "prebuild": "node scripts/prebuild.js",
+    "prepack": "([ $(ls prebuilds | wc -l) > '0' ] || (echo 'Some prebuilds are missing'; exit 1))",
     "test": "node-gyp rebuild --directory test && nyc mocha --expose-gc --reporter spec"
   },
   "repository": {

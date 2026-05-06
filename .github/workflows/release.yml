@@ -7,23 +7,33 @@ on:
 
 jobs:
   prebuild:
-    name: Test on ${{ matrix.os }} with Node.js ${{ matrix.node-version }}
+    name: Prebuild on ${{ matrix.os }} ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
-        node-version: [20.x, 22.x, 24.x]
+        include:
+          - os: ubuntu-latest
+            arch: x64
+          - os: windows-latest
+            arch: x64
+          - os: windows-latest
+            arch: x86
+          - os: macos-latest
+            arch: x64
+          - os: macos-15-intel
+            arch: x64
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '22.x'
+          architecture: ${{ matrix.arch }}
           cache: 'npm'
 
       - name: Install dependencies
@@ -36,13 +46,12 @@ jobs:
         run: npm run test
 
       - name: Prebuild
-        shell: bash
         run: npm run prebuild
 
       - name: Upload prebuilds
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: node-ffi-napi-prebuild-${{ matrix.os }}-${{ matrix.node-version }}
+          name: node-ffi-napi-prebuild-${{ matrix.os }}-${{ matrix.arch }}
           path: prebuilds/
 
   publish:
@@ -55,10 +64,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22.x'
           registry-url: 'https://registry.npmjs.org'
@@ -71,9 +80,11 @@ jobs:
         run: npm test
 
       - name: Download all prebuilds
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           path: prebuilds
+          merge-multiple: true
+
       - run: ls -R prebuilds/
 
       - name: Publish to npm
