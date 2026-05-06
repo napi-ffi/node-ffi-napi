@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }} with Node.js ${{ matrix.node-version }}
+    name: Test on ${{ matrix.os }} ${{ matrix.arch }} with Node.js ${{ matrix.node-version }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -19,15 +19,24 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
         node-version: [20.x, 22.x, 24.x]
+        arch: [x64]
+        include:
+          - os: windows-latest
+            node-version: 20.x
+            arch: x86
+          - os: windows-latest
+            node-version: 22.x
+            arch: x86
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
+          architecture: ${{ matrix.arch }}
           cache: 'npm'
 
       - name: Install dependencies
@@ -49,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up MSYS2 with MINGW64
         uses: msys2/setup-msys2@v2
