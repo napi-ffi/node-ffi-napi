@@ -1,6 +1,6 @@
 {
   "name": "@napi-ffi/ffi-napi",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "license": "MIT",
   "author": "Anna Henningsen <anna@addaleax.net>",
   "contributors": [
@@ -33,7 +33,7 @@
     "@napi-ffi/get-uv-event-loop-napi-h": "^1.0.6",
     "node-addon-api": "^8.2.1",
     "node-gyp-build": "^4.8.2",
-    "@napi-ffi/ref-napi": "^3.0.7",
+    "@napi-ffi/ref-napi": "^3.0.8",
     "@napi-ffi/ref-struct-di": "^1.1.1"
   },
   "devDependencies": {
