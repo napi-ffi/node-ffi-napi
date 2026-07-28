@@ -41,6 +41,7 @@
     "mocha": "^7.1.1",
     "nyc": "^17.1.0",
     "prebuildify": "^6.0.1",
+    "node-gyp": "^12.4.0",
     "@napi-ffi/ref-array-di": "^1.2.2"
   },
   "scripts": {
