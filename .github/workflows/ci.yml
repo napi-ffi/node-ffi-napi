@@ -75,6 +75,16 @@ jobs:
         shell: msys2 {0}
         run: node -e "const os = require('os'); console.log('os.type():', os.type()); if (!os.type().startsWith('MINGW')) process.exit(1)"
 
+      - name: Remove pinned node-gyp devDependency
+        shell: msys2 {0}
+        # The pinned node-gyp (added to detect VS2026 for the MSVC-based jobs) gets
+        # hoisted into node_modules, which makes node-gyp-build's `require('node-gyp')`
+        # resolve locally instead of falling back to PATH. That skips the MSYS2-packaged
+        # node-gyp shim, which is the one that knows to build with `-f make` (GCC)
+        # instead of MSBuild/MASM, so native builds break under MinGW. Drop it here so
+        # this job keeps using the MSYS2 toolchain's own node-gyp.
+        run: npm pkg delete devDependencies.node-gyp
+
       - name: Install dependencies
         shell: msys2 {0}
         run: npm install
