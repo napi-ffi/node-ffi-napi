@@ -1,13 +1,9 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - '.github/**'
-      - 'README.md'
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -83,11 +79,22 @@ jobs:
         # node-gyp shim, which is the one that knows to build with `-f make` (GCC)
         # instead of MSBuild/MASM, so native builds break under MinGW. Drop it here so
         # this job keeps using the MSYS2 toolchain's own node-gyp.
+        #
+        # This has to happen before `npm install`, because the `install` lifecycle
+        # script (node-gyp-build) already builds the addon. It also leaves package.json
+        # out of sync with package-lock.json, so this job must stay on `npm install`
+        # rather than `npm ci`.
         run: npm pkg delete devDependencies.node-gyp
 
       - name: Install dependencies
         shell: msys2 {0}
         run: npm install
+
+      - name: Assert MSYS2 node-gyp is in use
+        shell: msys2 {0}
+        run: |
+          test ! -e node_modules/node-gyp || { echo "local node-gyp shadows the MSYS2 one"; exit 1; }
+          node-gyp --version
 
       - name: Build native tests
         shell: msys2 {0}
