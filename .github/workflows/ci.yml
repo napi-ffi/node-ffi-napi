@@ -13,10 +13,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
+        os: [ubuntu-latest, windows-latest, macos-15-intel]
         node-version: [20.x, 22.x, 24.x]
         arch: [x64]
         include:
+          - os: macos-latest
+            node-version: 20.x
+            arch: arm64
+          - os: macos-latest
+            node-version: 22.x
+            arch: arm64
+          - os: macos-latest
+            node-version: 24.x
+            arch: arm64
           - os: windows-latest
             node-version: 20.x
             arch: x86
@@ -47,6 +56,15 @@ jobs:
       - name: Prebuild
         shell: bash
         run: npm run prebuild
+
+      # Consumers resolve node-addon-api from our semver range, not our lockfile,
+      # so also build against the newest release to catch header changes early.
+      - name: Build and test against latest node-addon-api
+        shell: bash
+        run: |
+          npm install --no-save node-addon-api@latest
+          npm run build
+          npm run test
 
   test-mingw:
     name: Test MinGW (MSYS2 MINGW64) on Windows
