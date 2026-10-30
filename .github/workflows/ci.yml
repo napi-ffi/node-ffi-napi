@@ -67,22 +67,24 @@ jobs:
           npm run test
 
   test-mingw:
-    name: Test MinGW (MSYS2 MINGW64) on Windows
+    name: Test MinGW (MSYS2 UCRT64) on Windows
     runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up MSYS2 with MINGW64
+      # MSYS2 no longer builds nodejs for the MINGW64 (msvcrt) environment;
+      # UCRT64 is its replacement and uses the same GCC/MinGW-w64 toolchain.
+      - name: Set up MSYS2 with UCRT64
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: UCRT64
           update: true
           install: >-
-            mingw-w64-x86_64-nodejs
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-gcc
+            mingw-w64-ucrt-x86_64-nodejs
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-gcc
             make
 
       - name: Verify MinGW Node.js is active
