@@ -114,9 +114,10 @@ jobs:
         shell: msys2 {0}
         run: |
           test ! -e node_modules/node-gyp || { echo "local node-gyp shadows the MSYS2 one"; exit 1; }
-          # The UCRT64 package only ships node-gyp.cmd in bin/, which bash can't run.
-          # Call the shim npm puts on PATH for lifecycle scripts instead.
-          "$MINGW_PREFIX/lib/node_modules/npm/bin/node-gyp-bin/node-gyp" --version
+          # The UCRT64 package only ships node-gyp.cmd in bin/, which bash can't run, and
+          # npm's node-gyp-bin shim only resolves correctly when npm sets
+          # $npm_config_node_gyp for a lifecycle script. Call npm's node-gyp directly.
+          node "$MINGW_PREFIX/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js" --version
 
       - name: Build native tests
         shell: msys2 {0}
