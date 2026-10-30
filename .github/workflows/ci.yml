@@ -13,10 +13,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-15-intel]
+        os: [ubuntu-latest, windows-latest, macos-15-intel]
         node-version: [20.x, 22.x, 24.x]
         arch: [x64]
         include:
+          - os: macos-latest
+            node-version: 20.x
+            arch: arm64
+          - os: macos-latest
+            node-version: 22.x
+            arch: arm64
+          - os: macos-latest
+            node-version: 24.x
+            arch: arm64
           - os: windows-latest
             node-version: 20.x
             arch: x86
@@ -48,23 +57,34 @@ jobs:
         shell: bash
         run: npm run prebuild
 
+      # Consumers resolve node-addon-api from our semver range, not our lockfile,
+      # so also build against the newest release to catch header changes early.
+      - name: Build and test against latest node-addon-api
+        shell: bash
+        run: |
+          npm install --no-save node-addon-api@latest
+          npm run build
+          npm run test
+
   test-mingw:
-    name: Test MinGW (MSYS2 MINGW64) on Windows
+    name: Test MinGW (MSYS2 UCRT64) on Windows
     runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up MSYS2 with MINGW64
+      # MSYS2 no longer builds nodejs for the MINGW64 (msvcrt) environment;
+      # UCRT64 is its replacement and uses the same GCC/MinGW-w64 toolchain.
+      - name: Set up MSYS2 with UCRT64
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: UCRT64
           update: true
           install: >-
-            mingw-w64-x86_64-nodejs
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-gcc
+            mingw-w64-ucrt-x86_64-nodejs
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-gcc
             make
 
       - name: Verify MinGW Node.js is active
@@ -94,7 +114,10 @@ jobs:
         shell: msys2 {0}
         run: |
           test ! -e node_modules/node-gyp || { echo "local node-gyp shadows the MSYS2 one"; exit 1; }
-          node-gyp --version
+          # The UCRT64 package only ships node-gyp.cmd in bin/, which bash can't run, and
+          # npm's node-gyp-bin shim only resolves correctly when npm sets
+          # $npm_config_node_gyp for a lifecycle script. Call npm's node-gyp directly.
+          node "$MINGW_PREFIX/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js" --version
 
       - name: Build native tests
         shell: msys2 {0}
